@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_cart/models/product.dart';
-import 'package:shopping_cart/ui/shoppingcart/index2.dart';
 
 class ShoppingCartPage extends StatelessWidget {
   const ShoppingCartPage({Key? key}) : super(key: key);
@@ -60,14 +59,16 @@ class ShoppingCartPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
           icon: const Icon(Icons.arrow_back),
           tooltip: 'Back',
         ),
         title: const Text('Shopping Cart'),
       ),
       body: ListView.builder(
-        padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           itemCount: items.length,
           itemBuilder: (BuildContext context, int index) {
             return Card(
@@ -167,6 +168,52 @@ class ShoppingCartPage extends StatelessWidget {
       //     ),
       //   ],
       // ),
+    );
+  }
+}
+
+class ShoppingCartItemQty extends StatefulWidget {
+  const ShoppingCartItemQty({Key? key}) : super(key: key);
+
+  @override
+  State<ShoppingCartItemQty> createState() => _ShoppingCartItemQtyState();
+}
+
+class _ShoppingCartItemQtyState extends State<ShoppingCartItemQty> {
+  int _qty = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _qty = 1;
+            });
+          },
+          icon: const Icon(Icons.delete),
+        ),
+        // SizedBox(width: 12),
+        IconButton(
+          onPressed: () {
+            setState(() {
+              if (_qty > 1) _qty--;
+            });
+          },
+          icon: const Icon(Icons.remove),
+        ),
+        Text('$_qty'),
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _qty++;
+            });
+          },
+          icon: const Icon(Icons.add),
+        ),
+      ],
     );
   }
 }
