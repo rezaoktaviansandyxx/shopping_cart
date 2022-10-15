@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shopping_cart/models/cart.dart';
 import 'package:shopping_cart/models/product.dart';
 
 class ProductDetailPage extends StatelessWidget {
@@ -23,7 +25,7 @@ class ProductDetailPage extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          Image.asset(
+          Image.network(
             product.image,
             height: 300,
             fit: BoxFit.cover,
@@ -75,12 +77,14 @@ class ProductDetailPage extends StatelessWidget {
         ConstrainedBox(
           constraints: const BoxConstraints.expand(),
           child: TextButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              Provider.of<Cart>(context, listen: false).addToCart(product);
+              Navigator.pushNamed(context, '/shopping_cart');
+            },
             icon: const Icon(Icons.shopping_cart_outlined),
             label: const Text('Add to Cart'),
             style: TextButton.styleFrom(
-              primary: Colors.white,
-              backgroundColor: Colors.tealAccent.shade700,
+              foregroundColor: Colors.white, backgroundColor: Colors.tealAccent.shade700,
             ),
           ),
         )

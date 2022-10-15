@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shopping_cart/models/cart.dart';
 import 'package:shopping_cart/models/product.dart';
 
 class ShoppingCartPage extends StatelessWidget {
@@ -67,31 +70,46 @@ class ShoppingCartPage extends StatelessWidget {
         ),
         title: const Text('Shopping Cart'),
       ),
-      body: ListView.builder(
-          padding: const EdgeInsets.all(10),
-          itemCount: items.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              child: Column(
-                children: [
-                  ListTile(
-                    title: Text(items[index].name),
-                    leading: Image.asset(
-                      items[index].image,
-                      height: 56.0,
-                      width: 56.0,
-                      fit: BoxFit.cover,
+      body: Consumer<Cart>(
+        builder: (BuildContext context, Cart cart, Widget? child) {
+          return ListView.builder(
+            padding: const EdgeInsets.all(10),
+            itemCount: cart.items.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        cart.items[index].product.name,
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      leading: Image.network(
+                        items[index].image,
+                        height: 56.0,
+                        width: 56.0,
+                        fit: BoxFit.cover,
+                      ),
+                      subtitle: Text(
+                        'Rp${cart.items[index].product.price}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
-                    subtitle: Text(
-                      'Rp${items[index].price}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ShoppingCartItemQty(
+                      index: index,
                     ),
-                  ),
-                  const ShoppingCartItemQty(),
-                ],
-              ),
-            );
-          }),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
       // ListView.builder(
       //     itemCount: items.length,
       //     itemBuilder: (BuildContext context, int index) {
@@ -168,19 +186,19 @@ class ShoppingCartPage extends StatelessWidget {
       //     ),
       //   ],
       // ),
+      bottomNavigationBar: const ShoppingCartTotal(),
     );
   }
 }
 
-class ShoppingCartItemQty extends StatefulWidget {
-  const ShoppingCartItemQty({Key? key}) : super(key: key);
+// ignore: must_be_immutable
+class ShoppingCartItemQty extends StatelessWidget {
+  const ShoppingCartItemQty({
+    Key? key,
+    required this.index,
+  }) : super(key: key);
 
-  @override
-  State<ShoppingCartItemQty> createState() => _ShoppingCartItemQtyState();
-}
-
-class _ShoppingCartItemQtyState extends State<ShoppingCartItemQty> {
-  int _qty = 1;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -189,31 +207,84 @@ class _ShoppingCartItemQtyState extends State<ShoppingCartItemQty> {
       children: [
         IconButton(
           onPressed: () {
-            setState(() {
-              _qty = 1;
-            });
+            Provider.of<Cart>(context, listen: false).removeFromCart(index);
           },
           icon: const Icon(Icons.delete),
         ),
         // SizedBox(width: 12),
         IconButton(
           onPressed: () {
-            setState(() {
-              if (_qty > 1) _qty--;
-            });
+            Provider.of<Cart>(context, listen: false).decItemQty(index);
           },
           icon: const Icon(Icons.remove),
         ),
-        Text('$_qty'),
+        Selector<Cart, int>(
+            builder: (BuildContext context, int qty, Widget? child) {
+          return Text('$qty');
+        }, selector: (BuildContext context, Cart cart) {
+          return cart.items[index].qty;
+        }),
         IconButton(
           onPressed: () {
-            setState(() {
-              _qty++;
-            });
+            Provider.of<Cart>(context, listen: false).incItemQty(index);
           },
           icon: const Icon(Icons.add),
         ),
       ],
+    );
+  }
+}
+
+class ShoppingCartTotal extends StatelessWidget {
+  const ShoppingCartTotal({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border(
+        top: BorderSide(color: Colors.tealAccent.shade400),
+      )),
+      child: Consumer<Cart>(
+        builder: (BuildContext context, Cart cart, Widget? child) {
+          return ListTile(
+            title: const Text(
+              'Total Price',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              'Rp${cart.totalPrice}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            trailing: ConstrainedBox(
+              constraints: const BoxConstraints(
+                minWidth: 150,
+              ),
+              child: TextButton(
+                onPressed: cart.items.isNotEmpty
+                    ? () {
+                        Navigator.pushNamed(context, '/checkout');
+                      }
+                    : null,
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: cart.items.isNotEmpty
+                      ? Colors.tealAccent.shade700
+                      : Colors.grey.shade400,
+                ),
+                child: const Text('Checkout'),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

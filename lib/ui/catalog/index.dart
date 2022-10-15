@@ -1,63 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shopping_cart/main.dart';
+import 'package:shopping_cart/models/cart.dart';
 import 'package:shopping_cart/models/product.dart';
-import 'package:shopping_cart/ui/product_detail/index.dart';
 
 class CatalogPage extends StatelessWidget {
   const CatalogPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final List<Product> products = [
-      Product(
-        id: '1',
-        name: 'Shoe 1',
-        description: 'This is a shoe',
-        price: 129000,
-        image: 'assets/shoe1.jpg',
-      ),
-      Product(
-        id: '2',
-        name: 'Shoe 2',
-        description: 'This is another shoe',
-        price: 129000,
-        image: 'assets/shoe2.jpg',
-      ),
-      Product(
-        id: '3',
-        name: 'Shoe 3',
-        description: 'This is also a shoe',
-        price: 129000,
-        image: 'assets/shoe3.jpg',
-      ),
-    ];
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          tooltip: 'Menu',
-          onPressed: () {},
-        ),
-        title: const Text('Catalog'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/shopping_cart');
-            },
-            icon: const Icon(Icons.shopping_cart),
-            tooltip: 'Shopping Cart',
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.menu),
+            tooltip: 'Menu',
+            onPressed: () {},
           ),
-        ],
-      ),
-      body: ListView.builder(
-        itemCount: products.length,
-        padding: const EdgeInsets.all(10),
-        itemBuilder: (BuildContext context, int index) {
-          return CatalogProductCard(
-            product: products[index],
-          );
-        },
-      ),
-    );
+          title: const Text('Catalog'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/shopping_cart');
+              },
+              icon: const Icon(Icons.shopping_cart),
+              tooltip: 'Shopping Cart',
+            ),
+          ],
+        ),
+        body: FutureBuilder(
+          future: getProductsFromFirebase(),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<Product>> snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  'An Error Has Occured:\n${snapshot.error}',
+                  textAlign: TextAlign.center,
+                ),
+              );
+            }
+            if (snapshot.hasData) {
+              List<Product> products = snapshot.data!;
+              return ListView.builder(
+                  itemCount: products.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return CatalogProductCard(product: products[index]);
+                  });
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        ));
   }
 }
 
@@ -75,7 +69,7 @@ class CatalogProductCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
-            Image.asset(
+            Image.network(
               product.image,
               fit: BoxFit.cover,
             ),
@@ -109,12 +103,15 @@ class CatalogProductCard extends StatelessWidget {
                       ConstrainedBox(
                         constraints: const BoxConstraints(minWidth: 200),
                         child: TextButton.icon(
-                          onPressed: () {},
+                          onPressed: () {
+                            Provider.of<Cart>(context, listen: false)
+                                .addToCart(product);
+                            Navigator.pushNamed(context, '/shopping_cart');
+                          },
                           icon: const Icon(Icons.shopping_cart_outlined),
                           label: const Text('Add to Cart'),
                           style: TextButton.styleFrom(
-                              primary: Colors.white,
-                              backgroundColor: Colors.tealAccent.shade700),
+                              foregroundColor: Colors.white, backgroundColor: Colors.tealAccent.shade700),
                         ),
                       ),
                     ],
