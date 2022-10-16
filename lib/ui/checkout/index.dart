@@ -106,11 +106,12 @@ class _CheckoutFormState extends State<CheckoutForm> {
                     _formKey.currentState!.save();
                     _order.cart = List.from(
                         Provider.of<Cart>(context, listen: false).items);
-                    print('Name: ${_order.name}');
-                    print('Contact: ${_order.contact}');
-                    print('Address: ${_order.address}');
-                    print('Length: ${_order.cart.length}');
-                    sweatAlert(context);
+                    // print('Name: ${_order.name}');
+                    // print('Contact: ${_order.contact}');
+                    // print('Address: ${_order.address}');
+                    // print('Length: ${_order.cart.length}');
+                    Navigator.pushReplacementNamed(context, 'process_checkout',
+                        arguments: _order);
                   }
                 },
                 child: const Text('Place Order'),
@@ -123,21 +124,21 @@ class _CheckoutFormState extends State<CheckoutForm> {
   }
 }
 
-void sweatAlert(BuildContext context) {
-  Alert(
-    context: context,
-    type: AlertType.success,
-    title: "Checkout Berhasil",
-    desc: "Selamat anda berhasil checkout",
-    buttons: [
-      DialogButton(
-        child: const Text(
-          "Selanjutnya",
-          style: TextStyle(color: Colors.white, fontSize: 14),
-        ),
-        onPressed: () => Navigator.pushNamed(context, '/'),
-      )
-    ],
-  ).show();
-  return;
-}
+// void sweatAlert(BuildContext context) {
+//   Alert(
+//     context: context,
+//     type: AlertType.success,
+//     title: "Checkout Berhasil",
+//     desc: "Selamat anda berhasil checkout",
+//     buttons: [
+//       DialogButton(
+//         child: const Text(
+//           "Selanjutnya",
+//           style: TextStyle(color: Colors.white, fontSize: 14),
+//         ),
+//         onPressed: () => Navigator.pushNamed(context, '/'),
+//       )
+//     ],
+//   ).show();
+//   return;
+// }

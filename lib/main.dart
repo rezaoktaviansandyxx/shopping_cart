@@ -3,9 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopping_cart/models/cart.dart';
+import 'package:shopping_cart/models/order.dart';
 import 'package:shopping_cart/models/product.dart';
 import 'package:shopping_cart/ui/catalog/index.dart';
 import 'package:shopping_cart/ui/checkout/index.dart';
+import 'package:shopping_cart/ui/checkout/process_checkout.dart';
 import 'package:shopping_cart/ui/product_detail/index.dart';
 import 'package:shopping_cart/ui/shoppingcart/index.dart';
 
@@ -48,7 +50,9 @@ class StoreApp extends StatelessWidget {
         '/shopping_cart': (context) => const ShoppingCartPage(),
         '/product_detail': (context) => ProductDetailPage(
             product: ModalRoute.of(context)?.settings.arguments as Product),
-        '/checkout':(context) => const CheckoutPage(),
+        '/checkout': (context) => const CheckoutPage(),
+        'process_checkout': (context) => ProcessCheckoutPage(
+            order: ModalRoute.of(context)?.settings.arguments as Order),
       },
     );
   }
