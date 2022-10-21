@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shopping_cart/models/cart.dart';
 import 'package:shopping_cart/models/product.dart';
 
